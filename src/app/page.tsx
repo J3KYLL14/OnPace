@@ -1,65 +1,138 @@
-import Image from "next/image";
+import Link from "next/link";
+import { prisma } from "@/lib/db";
+import { ThemeToggle } from "@/components/theme-toggle";
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const routes = await prisma.route.findMany({
+    include: {
+      tasks: {
+        where: { isPublished: true },
+        select: {
+          id: true,
+          title: true,
+          dueDate: true,
+        },
+      },
+    },
+    orderBy: [{ yearLevel: "asc" }, { subject: "asc" }],
+  });
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-bh-black">
+      {/* Header */}
+      <nav className="bg-bh-charcoal">
+        <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+          <span className="font-bold text-white">OnPace</span>
+          <div className="flex items-center gap-3">
+            <ThemeToggle className="text-white/50 hover:text-white/80" />
+            <Link
+              href="/admin/login"
+              className="text-xs text-white/40 hover:text-white/70 transition"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+              Admin
+            </Link>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+      </nav>
+
+      {/* Content */}
+      <main className="flex-1 max-w-4xl mx-auto w-full px-4 py-8">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Assessment Tasks</h1>
+
+        <div className="space-y-3">
+          {/* Demo card — always shown so visitors can explore the app */}
+          <Link
+            href="/demo"
+            className="block bg-white dark:bg-bh-dark rounded-lg border border-bh-teal/30 dark:border-bh-teal/20 p-5 hover:border-bh-teal/60 dark:hover:border-bh-teal/50 transition group"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <div className="flex items-start justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-0.5">
+                  <span className="text-xs font-semibold uppercase tracking-wide text-bh-teal-dim dark:text-bh-teal bg-bh-teal/10 px-1.5 py-0.5 rounded">
+                    Demo
+                  </span>
+                  <span className="text-sm text-gray-500 dark:text-bh-muted">
+                    Year 12 — Creative Convergence
+                  </span>
+                </div>
+                <span className="text-lg font-semibold text-gray-900 dark:text-white group-hover:underline">
+                  Media Arts Production
+                </span>
+              </div>
+              <div className="text-right shrink-0 ml-4">
+                <div className="text-xs text-bh-teal-dim dark:text-bh-teal mt-1">
+                  View demo →
+                </div>
+              </div>
+            </div>
+          </Link>
+
+          {routes.length === 0 ? null : routes.map((route) => {
+              const task = route.tasks[0];
+              const slug = `/assignments/${route.slug}`;
+
+              return (
+                <div
+                  key={route.id}
+                  className="bg-white dark:bg-bh-dark rounded-lg border border-gray-200 dark:border-bh-surface p-5 hover:border-gray-300 dark:hover:border-bh-muted/30 transition"
+                >
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <div className="text-sm text-gray-500 dark:text-bh-muted mb-0.5">
+                        {route.yearLevel} — {route.subject}
+                      </div>
+                      {task ? (
+                        <Link
+                          href={slug}
+                          className="text-lg font-semibold text-gray-900 dark:text-white hover:text-bh-teal-dim dark:hover:text-bh-teal transition"
+                        >
+                          {task.title}
+                        </Link>
+                      ) : (
+                        <span className="text-gray-400 italic text-sm">No active task</span>
+                      )}
+                    </div>
+                    {task && (
+                      <div className="text-right shrink-0 ml-4">
+                        <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          Due{" "}
+                          {new Date(task.dueDate).toLocaleDateString("en-AU", {
+                            weekday: "short",
+                            day: "numeric",
+                            month: "short",
+                          })}
+                        </div>
+                        <Link
+                          href={slug}
+                          className="text-xs text-bh-teal-dim dark:text-bh-teal hover:underline mt-1 inline-block"
+                        >
+                          View timeline →
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+          })}
         </div>
       </main>
+
+      {/* Footer */}
+      <footer className="border-t border-gray-200 dark:border-bh-surface bg-white dark:bg-bh-charcoal px-4 py-3">
+        <div className="max-w-4xl mx-auto text-xs text-gray-400 dark:text-bh-muted">
+          OnPace Assessment Tracker — Designed by{" "}
+          <a
+            href="https://www.benjaminhyde.com.au"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-bh-teal-dim dark:text-bh-teal hover:underline"
+          >
+            Ben Hyde
+          </a>
+        </div>
+      </footer>
     </div>
   );
 }

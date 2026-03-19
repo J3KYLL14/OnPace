@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String?
+  passwordHash String
+  role         String   @default("admin") // "admin" | "superadmin"
+  createdAt    DateTime @default(now())
+}
+
+model Route {
+  id        String   @id @default(cuid())
+  yearLevel String
+  subject   String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  tasks     Task[]
+}
+
+model Task {
+  id             String          @id @default(cuid())
+  routeId        String
+  route          Route           @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  title          String
+  description    String?
+  startDate      DateTime
+  dueDate        DateTime
+  isDraft        Boolean         @default(true)
+  isPublished    Boolean         @default(false)
+  isArchived     Boolean         @default(false)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  scaffoldPoints ScaffoldPoint[]
+}
+
+model ScaffoldPoint {
+  id           String   @id @default(cuid())
+  taskId       String
+  task         Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  label        String
+  internalDate DateTime
+  displayOrder Int
+  position     String   @default("auto")
+  isKeyLabel   Boolean  @default(true)
+  tooltipText  String?
+  createdAt    DateTime @default(now())
+}

@@ -1,26 +1,15 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  /* Ben Hyde palette — pulled directly from benjaminhyde.com.au */
+  --color-bh-black:    #0d0d0f;
+  --color-bh-charcoal: #161619;
+  --color-bh-dark:     #1e1e22;
+  --color-bh-surface:  #2a2a2f;
+  --color-bh-muted:    #a0a0a8;
+  --color-bh-teal:     #00f0d0;
+  --color-bh-teal-dim: #00c4aa;
 }
