@@ -2,10 +2,15 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    await requireAuth();
+    const session = await requireAuth();
+    const isSuperAdmin = session.role === "superadmin";
+    const { searchParams } = new URL(request.url);
+    const mine = searchParams.get("mine") === "true";
+
     const tasks = await prisma.task.findMany({
+      where: (isSuperAdmin && !mine) ? undefined : { createdById: session.userId },
       orderBy: { createdAt: "desc" },
       include: {
         route: true,
@@ -20,12 +25,13 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    await requireAuth();
+    const session = await requireAuth();
     const data = await request.json();
 
     const task = await prisma.task.create({
       data: {
         routeId: data.routeId,
+        createdById: session.userId,
         title: data.title,
         description: data.description || null,
         startDate: new Date(data.startDate),

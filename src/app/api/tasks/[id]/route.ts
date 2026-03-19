@@ -2,13 +2,22 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 
+async function assertTaskOwner(id: string, userId: string, role: string) {
+  if (role === "superadmin") return true;
+  const task = await prisma.task.findUnique({ where: { id }, select: { createdById: true } });
+  return task?.createdById === userId;
+}
+
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireAuth();
+    const session = await requireAuth();
     const { id } = await params;
+    if (!(await assertTaskOwner(id, session.userId, session.role))) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
     const task = await prisma.task.findUnique({
       where: { id },
       include: {
@@ -30,8 +39,11 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireAuth();
+    const session = await requireAuth();
     const { id } = await params;
+    if (!(await assertTaskOwner(id, session.userId, session.role))) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
     const data = await request.json();
 
     type SpInput = { label: string; internalDate: string; displayOrder: number; position: string; isKeyLabel: boolean; tooltipText?: string | null };
@@ -85,8 +97,11 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireAuth();
+    const session = await requireAuth();
     const { id } = await params;
+    if (!(await assertTaskOwner(id, session.userId, session.role))) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
     await prisma.task.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch {

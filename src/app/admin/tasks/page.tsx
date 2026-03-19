@@ -18,16 +18,26 @@ interface Task {
 export default function TasksPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  const [showMine, setShowMine] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/me")
+      .then((r) => r.json())
+      .then((data) => setIsSuperAdmin(data.role === "superadmin"));
+  }, []);
 
   async function loadTasks() {
-    const res = await fetch("/api/tasks");
+    const url = isSuperAdmin && showMine ? "/api/tasks?mine=true" : "/api/tasks";
+    const res = await fetch(url);
     if (res.ok) setTasks(await res.json());
     setLoading(false);
   }
 
   useEffect(() => {
     loadTasks();
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showMine, isSuperAdmin]);
 
   async function handleAction(id: string, action: "publish" | "unpublish" | "archive" | "delete") {
     if (action === "delete" && !confirm("Delete this task?")) return;
@@ -56,7 +66,25 @@ export default function TasksPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Tasks</h1>
+        <div className="flex items-center gap-4">
+          <h1 className="text-2xl font-bold">Tasks</h1>
+          {isSuperAdmin && (
+            <div className="flex items-center rounded-lg border border-gray-200 overflow-hidden text-sm font-medium">
+              <button
+                onClick={() => setShowMine(false)}
+                className={`px-3 py-1.5 transition ${!showMine ? "bg-bh-teal text-bh-black" : "text-gray-500 hover:bg-gray-100"}`}
+              >
+                All
+              </button>
+              <button
+                onClick={() => setShowMine(true)}
+                className={`px-3 py-1.5 transition ${showMine ? "bg-bh-teal text-bh-black" : "text-gray-500 hover:bg-gray-100"}`}
+              >
+                Mine
+              </button>
+            </div>
+          )}
+        </div>
         <Link
           href="/admin/tasks/new"
           className="bg-bh-teal text-bh-black font-semibold px-4 py-2 rounded text-sm hover:bg-bh-teal-dim transition"

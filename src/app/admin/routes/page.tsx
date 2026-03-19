@@ -16,16 +16,26 @@ export default function RoutesPage() {
   const [yearLevel, setYearLevel] = useState("");
   const [subject, setSubject] = useState("");
   const [loading, setLoading] = useState(true);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  const [showMine, setShowMine] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/me")
+      .then((r) => r.json())
+      .then((data) => setIsSuperAdmin(data.role === "superadmin"));
+  }, []);
 
   async function loadRoutes() {
-    const res = await fetch("/api/routes");
+    const url = isSuperAdmin && showMine ? "/api/routes?mine=true" : "/api/routes";
+    const res = await fetch(url);
     if (res.ok) setRoutes(await res.json());
     setLoading(false);
   }
 
   useEffect(() => {
     loadRoutes();
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showMine, isSuperAdmin]);
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
@@ -49,7 +59,25 @@ export default function RoutesPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">Cohorts</h1>
+      <div className="flex items-center gap-4 mb-6">
+        <h1 className="text-2xl font-bold">Cohorts</h1>
+        {isSuperAdmin && (
+          <div className="flex items-center rounded-lg border border-gray-200 overflow-hidden text-sm font-medium">
+            <button
+              onClick={() => setShowMine(false)}
+              className={`px-3 py-1.5 transition ${!showMine ? "bg-bh-teal text-bh-black" : "text-gray-500 hover:bg-gray-100"}`}
+            >
+              All
+            </button>
+            <button
+              onClick={() => setShowMine(true)}
+              className={`px-3 py-1.5 transition ${showMine ? "bg-bh-teal text-bh-black" : "text-gray-500 hover:bg-gray-100"}`}
+            >
+              Mine
+            </button>
+          </div>
+        )}
+      </div>
 
       <form onSubmit={handleCreate} className="bg-white p-4 rounded-lg border border-gray-200 mb-6 flex gap-3 items-end">
         <div className="flex-1">
