@@ -4,7 +4,13 @@
 
 @theme inline {
   --font-sans: var(--font-geist-sans);
-  /* Ben Hyde palette — pulled directly from benjaminhyde.com.au */
+
+  /* Type — matches benjaminhyde.com.au */
+  --font-display: var(--font-syne), "Arial Black", ui-sans-serif, sans-serif;
+  --font-body: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-space-mono), ui-monospace, monospace;
+
+  /* Legacy dark palette — still used by the admin screens */
   --color-bh-black:    #0d0d0f;
   --color-bh-charcoal: #161619;
   --color-bh-dark:     #1e1e22;
@@ -12,4 +18,24 @@
   --color-bh-muted:    #a0a0a8;
   --color-bh-teal:     #00f0d0;
   --color-bh-teal-dim: #00c4aa;
+
+  /* Current benjaminhyde.com.au palette — student-facing pages */
+  --color-op-cream:       #fff8ec;
+  --color-op-ink:         #1a1a1a;
+  --color-op-ink-soft:    #3a3a3a;
+  --color-op-coral:       #ff7a59;
+  --color-op-yellow:      #ffc93c;
+  --color-op-yellow-soft: #ffe3a3;
+  --color-op-mint:        #7ed9b8;
+  --color-op-mint-soft:   #cff1e3;
+  --color-op-peach:       #ffd6cb;
+  --color-op-sand:        #e9e2d4;
+  --color-op-lavender:    #d9e0ff;
+  --color-op-rail:        #c9c1b1;
+
+  /* Hard offset shadows */
+  --shadow-hard-sm: 3px 3px 0 0 #1a1a1a;
+  --shadow-hard:    4px 4px 0 0 #1a1a1a;
+  --shadow-hard-md: 6px 6px 0 0 #1a1a1a;
+  --shadow-hard-lg: 8px 8px 0 0 #1a1a1a;
 }

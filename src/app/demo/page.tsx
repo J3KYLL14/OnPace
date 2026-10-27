@@ -8,10 +8,11 @@ export default function DemoPage() {
 
   return (
     <PaceboardTimeline
+      taskId="demo"
       task={{
         title: "Media Arts Production — Demo",
         description:
-          "This is a live demo of OnPace. Hover over the checkpoint tags to see student hints, and watch the red NOW marker track today's progress through the assessment period.",
+          "This is a live demo of OnPace. Tick off checkpoints as you go, open Details for your teacher’s notes, and add every date to your calendar in one tap.",
         startDate: d(-7),
         dueDate: d(7),
       }}
@@ -21,15 +22,17 @@ export default function DemoPage() {
       }}
       scaffoldPoints={[
         {
+          id: "demo-1",
           label: "Concept Pitch",
           internalDate: d(-5),
           displayOrder: 1,
           position: "above",
           isKeyLabel: true,
           tooltipText:
-            "Prepare a 2-minute verbal pitch covering your concept, target audience, and intended mood.\n\nNeed inspiration? https://www.youtube.com/results?search_query=media+arts+pitch+examples",
+            "Prepare a 2-minute verbal pitch covering your concept, target audience, and intended mood.\n\nPitch examples: https://www.youtube.com/results?search_query=media+arts+pitch+examples",
         },
         {
+          id: "demo-2",
           label: "Draft Storyboard",
           internalDate: d(-2),
           displayOrder: 2,
@@ -39,6 +42,7 @@ export default function DemoPage() {
             "Submit your storyboard via the class portal. Include at least 12 frames with annotations explaining each shot choice.",
         },
         {
+          id: "demo-3",
           label: "Peer Review",
           internalDate: d(3),
           displayOrder: 3,
@@ -48,6 +52,7 @@ export default function DemoPage() {
             "You will be assigned two peers to review. Use the feedback rubric provided on the class page. Be specific and constructive.",
         },
         {
+          id: "demo-4",
           label: "Final Submission",
           internalDate: d(6),
           displayOrder: 4,
